@@ -33,7 +33,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" bg-gray-50">
       <Header 
         onMenuClick={handleMenuClick} 
         searchQuery={globalSearchQuery}

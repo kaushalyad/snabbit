@@ -393,26 +393,29 @@ const Reports = ({ globalSearchQuery = "" }) => {
     try {
       // Get the filtered and sorted data directly from the memoized value
       const filteredData = filteredAndSortedData || [];
-      
+
       // Map the data to ensure all fields exist
-      const exportData = filteredData.map(item => ({
-        'Execution ID': item?.id || '',
-        'Host Name': item?.hostName || '',
-        'Host IP': item?.hostIP || '',
-        'Execution Name': item?.executionName || '',
-        'Start Date': item?.startDate || '',
-        'Execution State': item?.executionState || '',
-        'Type': item?.type || '',
-        'Executed by': item?.executedBy || ''
+      const exportData = filteredData.map((item) => ({
+        "Execution ID": item?.id || "",
+        "Host Name": item?.hostName || "",
+        "Host IP": item?.hostIP || "",
+        "Execution Name": item?.executionName || "",
+        "Start Date": item?.startDate || "",
+        "Execution State": item?.executionState || "",
+        Type: item?.type || "",
+        "Executed by": item?.executedBy || "",
       }));
 
       // Export as Excel
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Reports');
-      XLSX.writeFile(workbook, `reports-export-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
+      XLSX.writeFile(
+        workbook,
+        `reports-export-${format(new Date(), "yyyy-MM-dd")}.xlsx`
+      );
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
 
@@ -746,11 +749,11 @@ const Reports = ({ globalSearchQuery = "" }) => {
             <div className="flex items-center justify-left mb-4">
               <button
                 onClick={handleBack}
-                className="p-2 hover:bg-gray-50 rounded-md bg-white"
+                className="p-2 hover:bg-gray-50 rounded-md bg-gray-50"
               >
                 <img src={arrowLeftIcon} alt="Back" className="w-6 h-6" />
               </button>
-              <div className="text-lg font-medium text-black ml-2">Reports</div>
+              <div className="text-lg font-medium text-black ">Reports</div>
             </div>
             <div className="text-black -mt-16 p-10">
               View reports for hosts and projects scans
@@ -877,7 +880,9 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
                 {/* Sort Button */}
                 <button
-                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
                   className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
                 >
                   Sort
@@ -921,7 +926,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
           </div>
 
           {/* Table Container */}
-          <div className="px-4">
+          <div className="px-4 mt-5">
             <div className="overflow-x-auto bg-white rounded-lg">
               <table className="w-full table-fixed min-w-[1024px]">
                 <thead className="bg-gray-50">
@@ -1041,7 +1046,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
                           </p>
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleViewLogs(item.id)}
                               className="bg-white p-2 hover:bg-gray-50 rounded-lg"
