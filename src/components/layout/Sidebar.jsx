@@ -13,10 +13,10 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 border-r border-gray-200 bg-[#E6EAF1] z-40">
-      <nav className="h-full flex flex-col">
+    <aside className="fixed top-16 flex flex-col h-[calc(100vh-4rem)] left-0 w-64 border-r border-gray-200 bg-[#E6EAF1] z-40">
+      <nav className="flex flex-col h-full">
         {/* Main menu items */}
-        <div className="flex-1 py-4">
+        <div className="flex-1 py-4 overflow-y-auto">
           <ul className="space-y-1 px-2">
             <li>
               <Link
@@ -82,12 +82,12 @@ export default function Sidebar() {
         </div>
 
         {/* Settings at bottom */}
-        <div className="border-t border-gray-200">
+        <div className="mt-auto border-t border-gray-200 bg-[#E6EAF1]">
           <ul className="px-2 py-4">
             <li>
               <Link 
                 to="/settings"
-                className={`flex items-center px-4 py-2 text-black hover:text-gray-700 rounded ${location.pathname === '/settings' ? 'bg-white' : ''}`}
+                className={`flex  items-center px-4 py-2 text-black hover:text-gray-700 rounded ${location.pathname === '/settings' ? 'bg-white' : ''}`}
               >
                 <img src={settingsIcon} alt="Settings" className="h-6 w-6 mr-3" />
                 <span className="text-sm font-medium">Settings</span>

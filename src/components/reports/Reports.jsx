@@ -25,6 +25,8 @@ const Reports = ({ globalSearchQuery = "" }) => {
   const [showDatePickerModal, setShowDatePickerModal] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
 
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split("T")[0];
@@ -37,7 +39,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
     endDate: "",
   });
   const [sortOrder, setSortOrder] = useState("asc");
-  const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const [localSearchQuery, setLocalSearchQuery] = useState(globalSearchQuery);
   const [selectedFilters, setSelectedFilters] = useState({
     executionState: [],
     type: [],
@@ -385,6 +387,15 @@ const Reports = ({ globalSearchQuery = "" }) => {
     sortOrder,
   ]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const paginatedData = filteredAndSortedData.slice(startIndex, startIndex + rowsPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   const handleBack = () => {
     navigate(-1);
   };
@@ -703,7 +714,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   setDateRange({ startDate: "", endDate: "" });
                   onClose();
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 Cancel
               </button>
@@ -721,7 +732,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className=" bg-gray-200">
       {/* Filter Modal */}
       <FilterModal
         isOpen={showFilterModal}
@@ -742,14 +753,14 @@ const Reports = ({ globalSearchQuery = "" }) => {
       />
 
       {/* Main Content */}
-      <div className="w-full bg-gray-50">
-        <div className="w-full bg-gray-50">
+      <div className="w-full bg-gray-200">
+        <div className="w-full bg-gray-200">
           {/* Top row - Back button and Tabs */}
-          <div className="flex flex-col w-full mb-4 px-4">
-            <div className="flex items-center justify-left mb-4">
+          <div className="flex flex-col w-full mb-4 px-4 bg-gray-200">
+            <div className="flex items-center  justify-left mb-4">
               <button
                 onClick={handleBack}
-                className="p-2 hover:bg-gray-50 rounded-md bg-gray-50"
+                className="p-2 hover:bg-gray-200 rounded-md bg-gray-200"
               >
                 <img src={arrowLeftIcon} alt="Back" className="w-6 h-6" />
               </button>
@@ -758,324 +769,325 @@ const Reports = ({ globalSearchQuery = "" }) => {
             <div className="text-black -mt-16 p-10">
               View reports for hosts and projects scans
             </div>
-            <div className="flex items-center gap-4 overflow-x-auto pb-2">
-              <div className="flex space-x-4 min-w-fit">
-                <div
-                  onClick={() => setActiveTab("hosts")}
-                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
-                    activeTab === "hosts"
-                      ? "bg-gray-300 rounded-lg text-black"
-                      : "text-black hover:text-gray-700 bg-gray-50"
-                  }`}
-                >
-                  Hosts
-                </div>
-                <div
-                  onClick={() => setActiveTab("projects")}
-                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
-                    activeTab === "projects"
-                      ? "bg-gray-300 rounded-lg text-black"
-                      : "text-black hover:text-gray-700 bg-gray-50"
-                  }`}
-                >
-                  Projects
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Controls Row */}
-          <div className="space-y-4">
-            {/* Header section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex items-center gap-2">
-                {/* Removing the Reports text here */}
-              </div>
-            </div>
-
-            {/* Filters and Actions */}
-            <div className="grid grid-cols-12 gap-4 mb-4 px-4 bg-white">
-              {/* Left section - Hosts text */}
-              <div className="col-span-12 md:col-span-2">
-                <div className="bg-white font-['Inter'] font-[650] text-[20px] leading-[20px] tracking-[0px] align-middle text-black">
-                  Hosts
+            <div className=" bg-white rounded-[8px] py-5 px-2">
+              <div className="flex items-center gap-4 overflow-x-auto pb-2">
+                <div className="flex space-x-4 min-w-fit">
+                  <div
+                    onClick={() => setActiveTab("hosts")}
+                    className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
+                      activeTab === "hosts"
+                        ? "bg-gray-200 rounded-lg text-black"
+                        : "text-black hover:text-gray-700 bg-gray-white"
+                    }`}
+                  >
+                    Hosts
+                  </div>
+                  <div
+                    onClick={() => setActiveTab("projects")}
+                    className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
+                      activeTab === "projects"
+                        ? "bg-gray-200 rounded-lg text-black"
+                        : "text-black hover:text-gray-700 bg-whitw"
+                    }`}
+                  >
+                    Projects
+                  </div>
                 </div>
               </div>
 
-              {/* Right section - Controls */}
-              <div className="col-span-12 md:col-span-10 flex flex-col md:flex-row items-start md:items-center justify-start md:justify-end space-y-4 md:space-y-0 md:space-x-4">
-                {/* Time Filter Section */}
-                <div className="flex items-center gap-4">
-                  <div className="inline-flex px-0 py-0 items-center hover:border-gray-200 hover:border bg-white border border-gray-200 border-solid rounded-[8px] min-w-fit">
-                    <div
-                      onClick={() => setTimeFilter("Weekly")}
-                      className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
-                    >
-                      <p
-                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
-                          timeFilter === "Weekly"
-                            ? "bg-gray-300 rounded-l-[8px] text-black"
-                            : "hover:text-gray-700 bg-gray-50"
-                        }`}
-                      >
-                        Weekly
-                      </p>
-                    </div>
-                    <div
-                      onClick={() => setTimeFilter("Monthly")}
-                      className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                    >
-                      <p
-                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
-                          timeFilter === "Monthly"
-                            ? "bg-gray-300 text-black"
-                            : "hover:text-gray-700 bg-gray-50"
-                        }`}
-                      >
-                        Monthly
-                      </p>
-                    </div>
-                    <div
-                      onClick={() => setTimeFilter("Yearly")}
-                      className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                    >
-                      <p
-                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
-                          timeFilter === "Yearly"
-                            ? "bg-gray-300 text-black"
-                            : "hover:text-gray-700 bg-gray-50"
-                        }`}
-                      >
-                        Yearly
-                      </p>
-                    </div>
-                    <div
-                      onClick={() => {
-                        setShowDatePickerModal(true);
-                        setTimeFilter("Custom");
-                      }}
-                      className={` text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                    >
-                      <p
-                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
-                          timeFilter === "Custom"
-                            ? "bg-gray-300 rounded-r-[8px] text-black"
-                            : "hover:text-gray-700 bg-gray-50 rounded-r-[8px]"
-                        }`}
-                      >
-                        Custom
-                      </p>
-                    </div>
+              {/* Controls Row */}
+              <div className="space-y-4 ">
+                {/* Header section */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    {/* Removing the Reports text here */}
                   </div>
                 </div>
 
-                {/* Filter Button */}
-                <button
-                  onClick={() => setShowFilterModal(true)}
-                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
-                >
-                  Filter
-                  <img src={filterIcon} alt="Filter" className="w-5 h-5" />
-                </button>
+                {/* Filters and Actions */}
+                <div className="grid grid-cols-12 gap-4 mb-4 px-4  ">
+                  {/* Left section - Hosts text */}
+                  <div className="col-span-12 md:col-span-2">
+                    <div className="bg-white font-['Inter'] font-[650] text-[20px] leading-[20px] tracking-[0px] align-middle text-black">
+                      Hosts
+                    </div>
+                  </div>
 
-                {/* Sort Button */}
-                <button
-                  onClick={() =>
-                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                  }
-                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
-                >
-                  Sort
-                  <img src={sortIcon} alt="Sort" className="w-5 h-5" />
-                </button>
+                  {/* Right section - Controls */}
+                  <div className="col-span-12 md:col-span-10 flex flex-col md:flex-row items-start md:items-center justify-start md:justify-end space-y-4 md:space-y-0 md:space-x-4">
+                    {/* Time Filter Section */}
+                    <div className="flex items-center gap-4">
+                      <div className="inline-flex px-0 py-0 items-center hover:border-gray-200 hover:border bg-white border border-gray-200 border-solid rounded-[8px] min-w-fit">
+                        <div
+                          onClick={() => setTimeFilter("Weekly")}
+                          className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
+                        >
+                          <p
+                            className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                              timeFilter === "Weekly"
+                                ? "bg-gray-200 rounded-l-[8px] text-black"
+                                : "hover:text-gray-700 bg-white"
+                            }`}
+                          >
+                            Weekly
+                          </p>
+                        </div>
+                        <div
+                          onClick={() => setTimeFilter("Monthly")}
+                          className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                        >
+                          <p
+                            className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                              timeFilter === "Monthly"
+                                ? "bg-gray-200 text-black"
+                                : "hover:text-gray-700 bg-white"
+                            }`}
+                          >
+                            Monthly
+                          </p>
+                        </div>
+                        <div
+                          onClick={() => setTimeFilter("Yearly")}
+                          className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                        >
+                          <p
+                            className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                              timeFilter === "Yearly"
+                                ? "bg-gray-200 text-black"
+                                : "hover:text-gray-700 bg-white"
+                            }`}
+                          >
+                            Yearly
+                          </p>
+                        </div>
+                        <div
+                          onClick={() => {
+                            setShowDatePickerModal(true);
+                            setTimeFilter("Custom");
+                          }}
+                          className={` text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                        >
+                          <p
+                            className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                              timeFilter === "Custom"
+                                ? "bg-gray-200 rounded-r-[8px] text-black"
+                                : "hover:text-gray-700 bg-white rounded-r-[8px]"
+                            }`}
+                          >
+                            Custom
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* Search Input */}
-                <div className="w-full md:w-64 relative order-1 md:order-none">
-                  <input
-                    type="text"
-                    value={localSearchQuery}
-                    onChange={(e) => setLocalSearchQuery(e.target.value)}
-                    placeholder="Search"
-                    className="w-full rounded-lg border border-gray-200 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-black"
-                  />
-                  <svg
-                    className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
+                    {/* Filter Button */}
+                    <button
+                      onClick={() => setShowFilterModal(true)}
+                      className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-200 whitespace-nowrap min-w-[80px]"
+                    >
+                      Filter
+                      <img src={filterIcon} alt="Filter" className="w-5 h-5" />
+                    </button>
+
+                    {/* Sort Button */}
+                    <button
+                      onClick={() =>
+                        setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                      }
+                      className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-200 whitespace-nowrap min-w-[80px]"
+                    >
+                      Sort
+                      <img src={sortIcon} alt="Sort" className="w-5 h-5" />
+                    </button>
+
+                    {/* Search Input */}
+                    <div className="relative min-w-[200px] max-w-[300px]">
+                      <input
+                        type="text"
+                        value={localSearchQuery}
+                        onChange={(e) => setLocalSearchQuery(e.target.value)}
+                        placeholder="Search"
+                        className="w-full rounded-lg border border-gray-200 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-black"
+                      />
+                      <svg
+                        className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+
+                    {/* Export Button */}
+                    <button
+                      onClick={handleExport}
+                      className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-800 whitespace-nowrap min-w-[90px]"
+                    >
+                      <img src={exportIcon} alt="Export" className="w-5 h-5" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="px-4 mt-5">
+                <div className="bg-white rounded-lg h-[320px]">
+                  <table className="w-full table-fixed min-w-[1024px]">
+                    <thead className="bg-gray-200 sticky top-0 z-10">
+                      <tr className="bg-gray-200 border-b border-gray-200 h-[32px]">
+                        <th className="w-[80px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Execution ID
+                        </th>
+                        <th className="w-[100px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Host Name
+                        </th>
+                        <th className="w-[100px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Host IP
+                        </th>
+                        <th className="w-[150px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Execution Name
+                        </th>
+                        <th className="w-[100px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Start Date
+                        </th>
+                        <th className="w-[200px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Execution State
+                        </th>
+                        <th className="w-[80px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Type
+                        </th>
+                        <th className="w-[100px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Executed by
+                        </th>
+                        <th className="w-[100px] px-2 py-1 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
+                          Logs
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {paginatedData.length === 0 ? (
+                        <tr className="h-[240px]">
+                          <td colSpan="8" className="px-2 py-1 text-sm text-center text-gray-500">
+                            No data found
+                          </td>
+                        </tr>
+                      ) : (
+                        paginatedData.map((item) => (
+                          <tr key={item.id} className="hover:bg-gray-200 h-[32px]">
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              <span className="text-[#005BD3] border-b-2 border-[#005BD3]">
+                                {item.id}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              {item.hostName}
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              {item.hostIP}
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              {item.executionName}
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              {item.startDate}
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              <div className="flex items-center gap-2">
+                                <div className="w-[200px] h-3 bg-gray-100 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      item.progress === 100
+                                        ? "bg-red-500"
+                                        : item.progress <= 25
+                                        ? "bg-red-500"
+                                        : item.progress <= 50
+                                        ? "bg-yellow-500"
+                                        : item.progress <= 75
+                                        ? "bg-blue-500"
+                                        : "bg-green-500"
+                                    }`}
+                                    style={{ width: `${item.progress}%` }}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium text-black">
+                                  {item.progress}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              {item.type}
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              <p className="bg-gray-200 rounded-[8px] py-[1px] px-2 items-center text-center">
+                                {item.executedBy}
+                              </p>
+                            </td>
+                            <td className="px-2 py-1 whitespace-nowrap text-xs text-black">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => handleViewLogs(item.id)}
+                                  className="bg-white p-2 hover:bg-gray-200 rounded-lg"
+                                >
+                                  <img
+                                    src={eyeIcon}
+                                    alt="View Logs"
+                                    className="w-6 h-6"
+                                    style={{ color: "#000000" }}
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => handleViewLogs(item.id)}
+                                  className="bg-white p-2 hover:bg-gray-200 rounded-lg"
+                                >
+                                  <img
+                                    src={fileIcon}
+                                    alt="Download Logs"
+                                    className="w-6 h-6"
+                                    style={{ color: "#000000" }}
+                                  />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* Export Button - now after Search Input */}
-                <button
-                  onClick={handleExport}
-                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-800 whitespace-nowrap"
-                >
-                  <img src={exportIcon} alt="Export" className="w-5 h-5" />
-                  Export
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Table Container */}
-          <div className="px-4 mt-5">
-            <div className="overflow-x-auto bg-white rounded-lg">
-              <table className="w-full table-fixed min-w-[1024px]">
-                <thead className="bg-gray-50">
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="w-[90px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">
-                      Execution ID
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[100px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Host Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[100px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Host IP
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[100px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Execution Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[120px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Start Date
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[200px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Execution State
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[90px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Type
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[90px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Executed by
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-[100px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap"
-                    >
-                      Logs
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {filteredAndSortedData.length === 0 ? (
-                    <tr className="h-24">
-                      <td
-                        colSpan="9"
-                        className="px-4 py-8 text-center text-sm text-gray-500 h-full"
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-end mt-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <div className="flex items-center justify-center w-full h-full">
-                          No data available
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredAndSortedData.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          <span className="text-[#005BD3] border-b-2 border-[#005BD3]">
-                            {item.id}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          {item.hostName}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          {item.hostIP}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          {item.executionName}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          {item.startDate}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          <div className="flex items-center gap-2">
-                            <div className="w-[160px] h-3 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  item.progress <= 25
-                                    ? "bg-red-500"
-                                    : item.progress <= 50
-                                    ? "bg-yellow-500"
-                                    : item.progress <= 75
-                                    ? "bg-blue-500"
-                                    : "bg-green-500"
-                                }`}
-                                style={{ width: `${item.progress}%` }}
-                              />
-                            </div>
-                            <span className="text-sm font-medium text-black">
-                              {item.progress}%
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          {item.type}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          <p className="bg-gray-200 rounded-[8px] py-[1px] px-2 items-center text-center">
-                            {item.executedBy}
-                          </p>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap text-xs text-black">
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleViewLogs(item.id)}
-                              className="bg-white p-2 hover:bg-gray-50 rounded-lg"
-                            >
-                              <img
-                                src={eyeIcon}
-                                alt="View Logs"
-                                className="w-6 h-6"
-                                style={{ color: "#000000" }}
-                              />
-                            </button>
-                            <button
-                              onClick={() => handleViewLogs(item.id)}
-                              className="bg-white p-2 hover:bg-gray-50 rounded-lg"
-                            >
-                              <img
-                                src={fileIcon}
-                                alt="Download Logs"
-                                className="w-6 h-6"
-                                style={{ color: "#000000" }}
-                              />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

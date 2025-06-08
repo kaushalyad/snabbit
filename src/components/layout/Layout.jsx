@@ -33,7 +33,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className=" bg-gray-50">
+    <div className=" bg-gray-200">
       <Header 
         onMenuClick={handleMenuClick} 
         searchQuery={globalSearchQuery}
@@ -44,7 +44,7 @@ export default function Layout() {
         <div className={`${isMobile ? 'w-64 flex-shrink-0' : 'w-64 flex-shrink-0'} ${!isSidebarOpen && isMobile ? 'hidden' : ''}`}>
           <Sidebar />
         </div>
-        <main className="flex-1">
+        <main className="flex-1 bg-gray-200 ">
           <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <div className="max-w-[2000px] mx-auto">
               <Reports globalSearchQuery={globalSearchQuery} />
