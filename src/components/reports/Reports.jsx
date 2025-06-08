@@ -889,14 +889,14 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   <img src={sortIcon} alt="Sort" className="w-5 h-5" />
                 </button>
 
-                {/* Search Input - moved before Export Button and set bg to white */}
+                {/* Search Input */}
                 <div className="w-full md:w-64 relative order-1 md:order-none">
                   <input
                     type="text"
                     value={localSearchQuery}
                     onChange={(e) => setLocalSearchQuery(e.target.value)}
                     placeholder="Search"
-                    className="w-full rounded-lg border border-gray-200 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white text-black"
                   />
                   <svg
                     className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
