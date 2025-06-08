@@ -5,6 +5,7 @@ export default function Header({
   onMenuClick,
   searchQuery = "",
   setSearchQuery,
+  isMobile
 }) {
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -24,13 +25,16 @@ export default function Header({
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left section */}
         <div className="flex items-center">
-          <button
-            onClick={onMenuClick}
-            className="text-[#B5B5B5] hover:text-gray-300 lg:hidden"
-          >
-            <FiMenu className="h-6 w-6" />
-          </button>
-          <h1 className="hidden lg:block text-xl font-semibold text-[#FFFFFF] ml-4">
+          {isMobile && (
+            <button
+              onClick={onMenuClick}
+              className="text-[#B5B5B5] hover:text-gray-300"
+              aria-label="Toggle menu"
+            >
+              <FiMenu className="h-6 w-6" />
+            </button>
+          )}
+          <h1 className="text-xl font-semibold text-[#FFFFFF] ml-4">
             HASS
           </h1>
         </div>

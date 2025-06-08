@@ -15,6 +15,7 @@ import {
   startOfYear,
   endOfDay,
 } from "date-fns";
+import { FiDownload, FiArrowUp, FiFilter } from "react-icons/fi";
 
 const Reports = ({ globalSearchQuery = "" }) => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const Reports = ({ globalSearchQuery = "" }) => {
   const [timeFilter, setTimeFilter] = useState("Weekly");
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showDatePickerModal, setShowDatePickerModal] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split("T")[0];
@@ -747,7 +750,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
               >
                 <img src={arrowLeftIcon} alt="Back" className="w-6 h-6" />
               </button>
-              <div className=" text-lg font-medium text-black">Reports</div>
+              <div className="text-lg font-medium text-black ml-2">Reports</div>
             </div>
             <div className="text-black -mt-16 p-10">
               View reports for hosts and projects scans
@@ -758,7 +761,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   onClick={() => setActiveTab("hosts")}
                   className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "hosts"
-                      ? "bg-gray-500 rounded-lg text-white"
+                      ? "bg-gray-300 rounded-lg text-black"
                       : "text-black hover:text-gray-700 bg-gray-50"
                   }`}
                 >
@@ -768,7 +771,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   onClick={() => setActiveTab("projects")}
                   className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "projects"
-                      ? "bg-gray-500 rounded-lg text-white"
+                      ? "bg-gray-300 rounded-lg text-black"
                       : "text-black hover:text-gray-700 bg-gray-50"
                   }`}
                 >
@@ -779,114 +782,119 @@ const Reports = ({ globalSearchQuery = "" }) => {
           </div>
 
           {/* Controls Row */}
-          <div className="grid grid-cols-12 gap-4 mb-4 px-4 bg-white">
-            {/* Left section - Hosts text */}
-            <div className="col-span-2">
-              <div className="bg-white font-['Inter'] font-[650] text-[20px] leading-[20px] tracking-[0px] align-middle text-black">
-                Hosts
+          <div className="space-y-4">
+            {/* Header section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center gap-2">
+                {/* Removing the Reports text here */}
               </div>
             </div>
 
-            {/* Right section - Controls */}
-            <div className="col-span-10 flex items-center justify-end space-x-4">
-              {/* Time Filter Buttons */}
-              <div className="inline-flex px-0 py-0 items-center hover:border-gray-200 hover:border bg-white border border-gray-200 border-solid rounded-[8px]">
-                <div
-                  onClick={() => setTimeFilter("Weekly")}
-                  className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
-                >
-                  <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
-                      timeFilter === "Weekly"
-                        ? " bg-gray-500 rounded-l-[8px] text-black"
-                        : " hover:text-gray-700 bg-gray-50"
-                    }`}
-                  >
-                    Weekly
-                  </p>
-                </div>
-                <div
-                  onClick={() => setTimeFilter("Monthly")}
-                  className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                >
-                  <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
-                      timeFilter === "Monthly"
-                        ? " bg-gray-500 text-black"
-                        : " hover:text-gray-700 bg-gray-50"
-                    }`}
-                  >
-                    Monthly
-                  </p>
-                </div>
-                <div
-                  onClick={() => setTimeFilter("Yearly")}
-                  className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                >
-                  <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
-                      timeFilter === "Yearly"
-                        ? " bg-gray-500 text-black"
-                        : " hover:text-gray-700 bg-gray-50"
-                    }`}
-                  >
-                    Yearly
-                  </p>
-                </div>
-                <div
-                  onClick={() => {
-                    if (
-                      timeFilter === "Custom" &&
-                      dateRange.startDate &&
-                      dateRange.endDate
-                    ) {
-                      // If custom filter is already active, show the modal with current dates
-                      setShowDatePickerModal(true);
-                    } else {
-                      // If switching to custom, show the modal
-                      setTimeFilter("Custom");
-                      setShowDatePickerModal(true);
-                    }
-                  }}
-                  className={`text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
-                >
-                  <p
-                    className={`px-3 rounded-r-[8px] py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
-                      timeFilter === "Custom"
-                        ? " bg-gray-500 text-black"
-                        : "hover:text-gray-700 bg-gray-50"
-                    }`}
-                  >
-                    Custom
-                  </p>
+            {/* Filters and Actions */}
+            <div className="grid grid-cols-12 gap-4 mb-4 px-4 bg-white">
+              {/* Left section - Hosts text */}
+              <div className="col-span-12 md:col-span-2">
+                <div className="bg-white font-['Inter'] font-[650] text-[20px] leading-[20px] tracking-[0px] align-middle text-black">
+                  Hosts
                 </div>
               </div>
 
-              {/* Filter Button */}
-              <button
-                onClick={() => setShowFilterModal(true)}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
-              >
-                Filter
-                <img src={filterIcon} alt="Filter" className="w-5 h-5" />
-              </button>
+              {/* Right section - Controls */}
+              <div className="col-span-12 md:col-span-10 flex flex-col md:flex-row items-start md:items-center justify-start md:justify-end space-y-4 md:space-y-0 md:space-x-4">
+                {/* Time Filter Section */}
+                <div className="flex items-center gap-4">
+                  <div className="inline-flex px-0 py-0 items-center hover:border-gray-200 hover:border bg-white border border-gray-200 border-solid rounded-[8px] min-w-fit">
+                    <div
+                      onClick={() => setTimeFilter("Weekly")}
+                      className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
+                    >
+                      <p
+                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                          timeFilter === "Weekly"
+                            ? "bg-gray-300 rounded-l-[8px] text-black"
+                            : "hover:text-gray-700 bg-gray-50"
+                        }`}
+                      >
+                        Weekly
+                      </p>
+                    </div>
+                    <div
+                      onClick={() => setTimeFilter("Monthly")}
+                      className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                    >
+                      <p
+                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                          timeFilter === "Monthly"
+                            ? "bg-gray-300 text-black"
+                            : "hover:text-gray-700 bg-gray-50"
+                        }`}
+                      >
+                        Monthly
+                      </p>
+                    </div>
+                    <div
+                      onClick={() => setTimeFilter("Yearly")}
+                      className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                    >
+                      <p
+                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                          timeFilter === "Yearly"
+                            ? "bg-gray-300 text-black"
+                            : "hover:text-gray-700 bg-gray-50"
+                        }`}
+                      >
+                        Yearly
+                      </p>
+                    </div>
+                    <div
+                      onClick={() => {
+                        setShowDatePickerModal(true);
+                        setTimeFilter("Custom");
+                      }}
+                      className={` text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                    >
+                      <p
+                        className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
+                          timeFilter === "Custom"
+                            ? "bg-gray-300 rounded-r-[8px] text-black"
+                            : "hover:text-gray-700 bg-gray-50 rounded-r-[8px]"
+                        }`}
+                      >
+                        Custom
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-              {/* Sort Button */}
-              <button
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
-              >
-                Sort
-                <img src={sortIcon} alt="Sort" className="w-5 h-5" />
-              </button>
+                {/* Filter Button */}
+                <button
+                  onClick={() => setShowFilterModal(true)}
+                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
+                >
+                  Filter
+                  <img src={filterIcon} alt="Filter" className="w-5 h-5" />
+                </button>
 
-              {/* Search Input */}
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                {/* Sort Button */}
+                <button
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-black bg-white border border-gray-200 rounded-md hover:bg-gray-50 whitespace-nowrap"
+                >
+                  Sort
+                  <img src={sortIcon} alt="Sort" className="w-5 h-5" />
+                </button>
+
+                {/* Search Input - moved before Export Button and set bg to white */}
+                <div className="w-full md:w-64 relative order-1 md:order-none">
+                  <input
+                    type="text"
+                    value={localSearchQuery}
+                    onChange={(e) => setLocalSearchQuery(e.target.value)}
+                    placeholder="Search"
+                    className="w-full rounded-lg border border-gray-200 px-4 py-2 pl-10 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                  />
                   <svg
-                    className="h-5 w-5 text-gray-400"
+                    className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -899,51 +907,23 @@ const Reports = ({ globalSearchQuery = "" }) => {
                     />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  value={localSearchQuery}
-                  onChange={(e) => setLocalSearchQuery(e.target.value)}
-                  placeholder="Search"
-                  className="block w-64 rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                {localSearchQuery && (
-                  <button
-                    onClick={() => setLocalSearchQuery("")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
-                    aria-label="Clear search"
-                  >
-                    <svg
-                      className="w-4 h-4 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
 
-              {/* Export Button */}
-              <button
-                onClick={handleExport}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-800 whitespace-nowrap"
-              >
-                <img src={exportIcon} alt="Export" className="w-5 h-5" />
-                Export
-              </button>
+                {/* Export Button - now after Search Input */}
+                <button
+                  onClick={handleExport}
+                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-md hover:bg-gray-800 whitespace-nowrap"
+                >
+                  <img src={exportIcon} alt="Export" className="w-5 h-5" />
+                  Export
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Table Container */}
           <div className="px-4">
             <div className="overflow-x-auto bg-white rounded-lg">
-              <table className="w-full table-fixed">
+              <table className="w-full table-fixed min-w-[1024px]">
                 <thead className="bg-gray-50">
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="w-[90px] px-3 py-3 text-left text-xs font-medium text-gray-500 tracking-wider whitespace-nowrap">

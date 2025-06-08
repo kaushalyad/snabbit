@@ -8,19 +8,18 @@ import administrationIcon from '../../assets/administration.svg';
 import settingsIcon from '../../assets/settings.svg';
 import dropdownArrowIcon from '../../assets/dropdown-arrow.svg';
 import rightArrowIcon from '../../assets/right-arrow.svg';
-import leftArrowIcon from '../../assets/leftarrow-icon.svg';
 
 export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r border-gray-200 bg-[#E6EAF1]">
+    <aside className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 border-r border-gray-200 bg-[#E6EAF1] z-40">
       <nav className="h-full flex flex-col">
         {/* Main menu items */}
         <div className="flex-1 py-4">
           <ul className="space-y-1 px-2">
             <li>
-              <Link 
+              <Link
                 to="/"
                 className={`flex items-center px-4 py-2 text-black hover:text-gray-700 rounded ${location.pathname === '/' ? 'bg-white' : ''}`}
               >
