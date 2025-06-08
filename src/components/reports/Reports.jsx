@@ -6,6 +6,15 @@ import sortIcon from "../../assets/sort.svg";
 import exportIcon from "../../assets/export.svg";
 import eyeIcon from "../../assets/eye.svg";
 import fileIcon from "../../assets/file.svg";
+import { CSVLink } from "react-csv";
+import * as XLSX from "xlsx";
+import {
+  format,
+  startOfWeek,
+  startOfMonth,
+  startOfYear,
+  endOfDay,
+} from "date-fns";
 
 const Reports = ({ globalSearchQuery = "" }) => {
   const navigate = useNavigate();
@@ -378,8 +387,33 @@ const Reports = ({ globalSearchQuery = "" }) => {
   };
 
   const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log("Export clicked");
+    try {
+      // Get filtered data and ensure it's an array
+      const filteredData = getFilteredDataBySearch() || [];
+
+      // Map the data to ensure all fields exist
+      const exportData = filteredData.map((item) => ({
+        "Execution ID": item?.id || "",
+        "Host Name": item?.hostName || "",
+        "Host IP": item?.hostIP || "",
+        "Execution Name": item?.executionName || "",
+        "Start Date": item?.startDate || "",
+        "Execution State": item?.executionState || "",
+        Type: item?.type || "",
+        "Executed by": item?.executedBy || "",
+      }));
+
+      // Export as Excel
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
+      XLSX.writeFile(
+        workbook,
+        `reports-export-${format(new Date(), "yyyy-MM-dd")}.xlsx`
+      );
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
   };
 
   const handleViewLogs = (id) => {
@@ -699,7 +733,6 @@ const Reports = ({ globalSearchQuery = "" }) => {
         isOpen={showDatePickerModal}
         onClose={() => {
           setShowDatePickerModal(false);
-          // Don't reset date range when closing modal
         }}
         dateRange={dateRange}
         onDateChange={setDateRange}
@@ -722,24 +755,24 @@ const Reports = ({ globalSearchQuery = "" }) => {
             <div className="text-black -mt-16 p-10">
               View reports for hosts and projects scans
             </div>
-            <div className="flex items-center gap-4 overflow-x-auto pb-2 ">
-              <div className="flex space-x-4  min-w-fit">
+            <div className="flex items-center gap-4 overflow-x-auto pb-2">
+              <div className="flex space-x-4 min-w-fit">
                 <div
                   onClick={() => setActiveTab("hosts")}
-                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap bg-gray-50 text-black cursor-pointer ${
+                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "hosts"
-                      ? "bg-gray-400 rounded-lg"
-                      : "hover:text-gray-700 bg-gray-50"
+                      ? "bg-gray-500 rounded-lg text-white"
+                      : "text-black hover:text-gray-700 bg-gray-50"
                   }`}
                 >
                   Hosts
                 </div>
                 <div
                   onClick={() => setActiveTab("projects")}
-                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap bg-gray-50 text-black cursor-pointer ${
+                  className={`px-2 py-1 text-sm font-medium whitespace-nowrap cursor-pointer ${
                     activeTab === "projects"
-                      ? "bg-gray-400 rounded-lg"
-                      : "hover:text-gray-700 bg-gray-50"
+                      ? "bg-gray-500 rounded-lg text-white"
+                      : "text-black hover:text-gray-700 bg-gray-50"
                   }`}
                 >
                   Projects
@@ -766,10 +799,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
                 >
                   <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer ${
+                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
                       timeFilter === "Weekly"
-                        ? " bg-gray-400 rounded-l-[8px]"
-                        : "hover:text-gray-700 bg-gray-50"
+                        ? " bg-gray-500 rounded-l-[8px] text-black"
+                        : " hover:text-gray-700 bg-gray-50"
                     }`}
                   >
                     Weekly
@@ -780,10 +813,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
                 >
                   <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer ${
+                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
                       timeFilter === "Monthly"
-                        ? " bg-gray-400 "
-                        : "hover:text-gray-700 bg-gray-50"
+                        ? " bg-gray-500 text-black"
+                        : " hover:text-gray-700 bg-gray-50"
                     }`}
                   >
                     Monthly
@@ -794,10 +827,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
                 >
                   <p
-                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer ${
+                    className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
                       timeFilter === "Yearly"
-                        ? " bg-gray-400 "
-                        : "hover:text-gray-700 bg-gray-50"
+                        ? " bg-gray-500 text-black"
+                        : " hover:text-gray-700 bg-gray-50"
                     }`}
                   >
                     Yearly
@@ -821,9 +854,9 @@ const Reports = ({ globalSearchQuery = "" }) => {
                   className={`text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
                 >
                   <p
-                    className={`px-3 rounded-r-[8px] py-1 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer ${
+                    className={`px-3 rounded-r-[8px] py-1 text-sm font-medium whitespace-nowrap text-black  cursor-pointer ${
                       timeFilter === "Custom"
-                        ? " bg-gray-400"
+                        ? " bg-gray-500 text-black"
                         : "hover:text-gray-700 bg-gray-50"
                     }`}
                   >
