@@ -388,31 +388,28 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
   const handleExport = () => {
     try {
-      // Get filtered data and ensure it's an array
-      const filteredData = getFilteredDataBySearch() || [];
-
+      // Get the filtered and sorted data directly from the memoized value
+      const filteredData = filteredAndSortedData || [];
+      
       // Map the data to ensure all fields exist
-      const exportData = filteredData.map((item) => ({
-        "Execution ID": item?.id || "",
-        "Host Name": item?.hostName || "",
-        "Host IP": item?.hostIP || "",
-        "Execution Name": item?.executionName || "",
-        "Start Date": item?.startDate || "",
-        "Execution State": item?.executionState || "",
-        Type: item?.type || "",
-        "Executed by": item?.executedBy || "",
+      const exportData = filteredData.map(item => ({
+        'Execution ID': item?.id || '',
+        'Host Name': item?.hostName || '',
+        'Host IP': item?.hostIP || '',
+        'Execution Name': item?.executionName || '',
+        'Start Date': item?.startDate || '',
+        'Execution State': item?.executionState || '',
+        'Type': item?.type || '',
+        'Executed by': item?.executedBy || ''
       }));
 
       // Export as Excel
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
-      XLSX.writeFile(
-        workbook,
-        `reports-export-${format(new Date(), "yyyy-MM-dd")}.xlsx`
-      );
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Reports');
+      XLSX.writeFile(workbook, `reports-export-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
     } catch (error) {
-      console.error("Export failed:", error);
+      console.error('Export failed:', error);
     }
   };
 
