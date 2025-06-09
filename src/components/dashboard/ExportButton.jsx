@@ -2,39 +2,29 @@ import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { ChevronDownIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
+import { formatDataForExport, createExportFilename, DATE_FORMATS } from '../../utils/formatters';
 
 export default function ExportButton({ data, columns }) {
   const exportToExcel = (format) => {
-    // Prepare data for export
-    const exportData = data.map(row => {
-      const newRow = {};
-      columns.forEach(column => {
-        if (column.accessorKey) {
-          // Handle special cases for formatted cells
-          if (column.accessorKey === 'date') {
-            newRow[column.header] = new Date(row[column.accessorKey]).toLocaleDateString();
-          } else if (column.accessorKey === 'amount') {
-            newRow[column.header] = `$${row[column.accessorKey].toLocaleString()}`;
-          } else {
-            newRow[column.header] = row[column.accessorKey];
-          }
-        }
-      });
-      return newRow;
-    });
+    // Convert columns array to columnConfig object
+    const columnConfig = columns.reduce((config, column) => {
+      if (column.accessorKey) {
+        config[column.accessorKey] = {
+          header: column.header,
+          type: column.accessorKey === 'date' ? 'date' : 
+                column.accessorKey === 'amount' ? 'number' : 'string',
+          format: column.accessorKey === 'date' ? DATE_FORMATS.DISPLAY :
+                 column.accessorKey === 'amount' ? { style: 'currency', currency: 'USD' } : undefined
+        };
+      }
+      return config;
+    }, {});
 
-    // Create worksheet
+    const exportData = formatDataForExport(data, columnConfig);
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Data');
-
-    // Generate file
-    const fileName = `dashboard-export-${new Date().toISOString().split('T')[0]}`;
-    if (format === 'csv') {
-      XLSX.writeFile(wb, `${fileName}.csv`);
-    } else {
-      XLSX.writeFile(wb, `${fileName}.xlsx`);
-    }
+    XLSX.writeFile(wb, createExportFilename('dashboard-export', format));
   };
 
   return (

@@ -8,14 +8,8 @@ import eyeIcon from "../../assets/eye.svg";
 import fileIcon from "../../assets/file.svg";
 import { CSVLink } from "react-csv";
 import * as XLSX from "xlsx";
-import {
-  format,
-  startOfWeek,
-  startOfMonth,
-  startOfYear,
-  endOfDay,
-} from "date-fns";
 import { FiDownload, FiArrowUp, FiFilter } from "react-icons/fi";
+import { parseDate, formatDataForExport, createExportFilename, validateDateRange, DATE_FORMATS } from "../../utils/formatters";
 
 const Reports = ({ globalSearchQuery = "" }) => {
   const navigate = useNavigate();
@@ -23,8 +17,6 @@ const Reports = ({ globalSearchQuery = "" }) => {
   const [timeFilter, setTimeFilter] = useState("Weekly");
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showDatePickerModal, setShowDatePickerModal] = useState(false);
-  const [showSortMenu, setShowSortMenu] = useState(false);
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
@@ -48,221 +40,207 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
   // Mock data with entries across different time periods
   const [executions] = useState([
-    // Current Week (March 18-24, 2024)
+    // June 2025 Data (Current Week)
     {
-      id: "20240324",
-      hostName: "BEAT",
-      hostIP: "192.128.0.100",
-      executionName: "BEAT",
-      startDate: "2024-03-24 08:28:36",
-      progress: 55,
-      executionState: "In Progress",
-      type: "Template",
-      executedBy: "Shreya",
+      id: '20250608',
+      hostName: 'June_8_2025_Report',
+      hostIP: '192.168.0.101',
+      executionName: 'June_8_2025_Report',
+      startDate: '2025-06-08T10:00:00',
+      progress: 100,
+      executionState: 'Completed',
+      type: 'Report',
+      executedBy: 'System'
     },
     {
-      id: "20240323",
-      hostName: "Weekly_report_2",
-      hostIP: "192.128.0.100",
-      executionName: "Weekly_report_2",
-      startDate: "2024-03-23 19:17:15",
-      progress: 95,
-      executionState: "In Progress",
-      type: "Template",
-      executedBy: "Vignesh",
-    },
-    {
-      id: "20240322",
-      hostName: "Weekly_report_2",
-      hostIP: "192.128.0.100",
-      executionName: "Weekly_report_2",
-      startDate: "2024-03-22 19:17:15",
-      progress: 30,
-      executionState: "In Progress",
-      type: "Test case",
-      executedBy: "Mayank",
-    },
-    {
-      id: "20240321",
-      hostName: "Weekly_report_1",
-      hostIP: "192.128.0.100",
-      executionName: "Weekly_report_1",
-      startDate: "2024-03-21 10:00:00",
+      id: '20250607',
+      hostName: 'June_7_2025_Scan',
+      hostIP: '192.168.0.102',
+      executionName: 'June_7_2025_Scan',
+      startDate: '2025-06-07T14:30:00',
       progress: 75,
-      executionState: "In Progress",
-      type: "Template",
-      executedBy: "Shreya",
+      executionState: 'In Progress',
+      type: 'Scan',
+      executedBy: 'Mayank'
     },
     {
-      id: "20240320",
-      hostName: "Weekly_report_1",
-      hostIP: "192.128.0.100",
-      executionName: "Weekly_report_1",
-      startDate: "2024-03-20 15:30:00",
+      id: '20250606',
+      hostName: 'June_6_2025_Report',
+      hostIP: '192.168.0.103',
+      executionName: 'June_6_2025_Report',
+      startDate: '2025-06-06T09:15:00',
+      progress: 50,
+      executionState: 'In Progress',
+      type: 'Report',
+      executedBy: 'Shreya'
+    },
+    {
+      id: '20250605',
+      hostName: 'June_5_2025_Scan',
+      hostIP: '192.168.0.104',
+      executionName: 'June_5_2025_Scan',
+      startDate: '2025-06-05T09:00:00',
+      progress: 25,
+      executionState: 'In Progress',
+      type: 'Scan',
+      executedBy: 'Vignesh'
+    },
+    {
+      id: '20250604',
+      hostName: 'June_4_2025_Report',
+      hostIP: '192.168.0.105',
+      executionName: 'June_4_2025_Report',
+      startDate: '2025-06-04T11:20:00',
+      progress: 0,
+      executionState: 'Not Started',
+      type: 'Report',
+      executedBy: 'System'
+    },
+    {
+      id: '20250603',
+      hostName: 'June_3_2025_Scan',
+      hostIP: '192.168.0.106',
+      executionName: 'June_3_2025_Scan',
+      startDate: '2025-06-03T15:45:00',
+      progress: 90,
+      executionState: 'In Progress',
+      type: 'Scan',
+      executedBy: 'Mayank'
+    },
+    {
+      id: '20250602',
+      hostName: 'June_2_2025_Report',
+      hostIP: '192.168.0.107',
+      executionName: 'June_2_2025_Report',
+      startDate: '2025-06-02T08:00:00',
+      progress: 100,
+      executionState: 'Completed',
+      type: 'Report',
+      executedBy: 'System'
+    },
+    // February 2025 Data (Previous Month)
+    {
+      id: '20250228',
+      hostName: 'Feb_2025_Report',
+      hostIP: '192.128.0.100',
+      executionName: 'Feb_2025_Report',
+      startDate: '2025-02-28T16:45:00',
+      progress: 100,
+      executionState: 'Completed',
+      type: 'Template',
+      executedBy: 'Vignesh'
+    },
+    {
+      id: '20250215',
+      hostName: 'Feb_2025_Scan',
+      hostIP: '192.128.0.101',
+      executionName: 'Feb_2025_Scan',
+      startDate: '2025-02-15T10:30:00',
+      progress: 75,
+      executionState: 'In Progress',
+      type: 'Test case',
+      executedBy: 'Mayank'
+    },
+    // January 2025 Data
+    {
+      id: '20250131',
+      hostName: 'Jan_2025_Report',
+      hostIP: '192.128.0.107',
+      executionName: 'Jan_2025_Report',
+      startDate: '2025-01-31T15:20:00',
+      progress: 100,
+      executionState: 'Completed',
+      type: 'Template',
+      executedBy: 'Shreya'
+    },
+    {
+      id: '20250115',
+      hostName: 'Jan_2025_Scan',
+      hostIP: '192.128.0.108',
+      executionName: 'Jan_2025_Scan',
+      startDate: '2025-01-15T09:30:00',
       progress: 60,
-      executionState: "In Progress",
-      type: "Test case",
-      executedBy: "Vignesh",
-    },
-    // Current Month (March 2024)
-    {
-      id: "20240315",
-      hostName: "Monthly_scan_1",
-      hostIP: "192.128.0.100",
-      executionName: "Monthly_scan_1",
-      startDate: "2024-03-15 09:00:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Template",
-      executedBy: "Vignesh",
-    },
-    {
-      id: "20240310",
-      hostName: "Monthly_scan_2",
-      hostIP: "192.128.0.100",
-      executionName: "Monthly_scan_2",
-      startDate: "2024-03-10 14:30:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Test case",
-      executedBy: "Mayank",
-    },
-    {
-      id: "20240305",
-      hostName: "Monthly_scan_3",
-      hostIP: "192.128.0.100",
-      executionName: "Monthly_scan_3",
-      startDate: "2024-03-05 11:20:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Template",
-      executedBy: "Shreya",
-    },
-    // Current Year (2024)
-    {
-      id: "20240228",
-      hostName: "Feb_report",
-      hostIP: "192.128.0.100",
-      executionName: "Feb_report",
-      startDate: "2024-02-28 19:49:33",
-      progress: 100,
-      executionState: "Completed",
-      type: "Test case",
-      executedBy: "Mayank",
-    },
-    {
-      id: "20240215",
-      hostName: "Feb_scan",
-      hostIP: "192.128.0.100",
-      executionName: "Feb_scan",
-      startDate: "2024-02-15 14:30:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Template",
-      executedBy: "Shreya",
-    },
-    {
-      id: "20240131",
-      hostName: "Jan_report",
-      hostIP: "192.128.0.100",
-      executionName: "Jan_report",
-      startDate: "2024-01-31 16:45:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Template",
-      executedBy: "Vignesh",
-    },
-    {
-      id: "20240115",
-      hostName: "Jan_scan",
-      hostIP: "192.128.0.100",
-      executionName: "Jan_scan",
-      startDate: "2024-01-15 10:20:00",
-      progress: 100,
-      executionState: "Completed",
-      type: "Test case",
-      executedBy: "Mayank",
-    },
+      executionState: 'In Progress',
+      type: 'Scan',
+      executedBy: 'Mayank'
+    }
   ]);
+
+  // Add a handler for time filter changes
+  const handleTimeFilterChange = (newFilter) => {
+    setTimeFilter(newFilter);
+    // Reset pagination to first page when changing time filter
+    setCurrentPage(1);
+  };
 
   // Filter data based on time filter
   const getFilteredDataByTime = (data) => {
-    // For testing purposes, let's set a fixed current date to March 24, 2024
-    const currentDate = new Date("2024-03-24");
-    const startOfDay = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      currentDate.getDate()
-    );
+    // For testing, let's use June 9th, 2025 as the current date
+    const testDate = parseDate('2025-06-09');
+    testDate.setHours(0, 0, 0, 0);
 
-    // Calculate date ranges
-    const startOfWeek = new Date(startOfDay);
-    startOfWeek.setDate(startOfDay.getDate() - startOfDay.getDay()); // Start from Sunday
-
-    const startOfMonth = new Date(startOfDay);
-    startOfMonth.setDate(1); // Start from 1st of current month
-
-    const startOfYear = new Date(startOfDay);
-    startOfYear.setMonth(0, 1); // Start from January 1st
-
-    console.log("Current filter:", timeFilter);
-    if (timeFilter === "Custom") {
-      console.log("Custom date range:", dateRange);
-    }
-
-    return data.filter((item) => {
-      // Parse the item's date and set it to start of day for accurate comparison
-      const itemDate = new Date(item.startDate);
-      const itemDateOnly = new Date(
-        itemDate.getFullYear(),
-        itemDate.getMonth(),
-        itemDate.getDate()
-      );
+    const filteredData = data.filter((item) => {
+      // Parse the item's date and set time to start of day for consistent comparison
+      const itemDate = parseDate(item.startDate);
+      itemDate.setHours(0, 0, 0, 0);
+      
       let isInRange = false;
 
       switch (timeFilter) {
-        case "Weekly":
-          isInRange = itemDateOnly >= startOfWeek && itemDateOnly <= startOfDay;
+        case "Weekly": {
+          // Calculate start of week (7 days before test date)
+          const weekStart = new Date(testDate);
+          weekStart.setDate(testDate.getDate() - 7);
+          weekStart.setHours(0, 0, 0, 0);
+          
+          // Set end of week to end of test date
+          const weekEnd = new Date(testDate);
+          weekEnd.setHours(23, 59, 59, 999);
+          
+          isInRange = itemDate >= weekStart && itemDate <= weekEnd;
           break;
+        }
 
-        case "Monthly":
-          isInRange =
-            itemDateOnly >= startOfMonth && itemDateOnly <= startOfDay;
+        case "Monthly": {
+          // Calculate start of month
+          const monthStart = new Date(testDate.getFullYear(), testDate.getMonth(), 1);
+          monthStart.setHours(0, 0, 0, 0);
+          
+          // Calculate start of next month
+          const nextMonthStart = new Date(testDate.getFullYear(), testDate.getMonth() + 1, 1);
+          nextMonthStart.setHours(0, 0, 0, 0);
+          
+          isInRange = itemDate >= monthStart && itemDate < nextMonthStart;
           break;
+        }
 
-        case "Yearly":
-          isInRange = itemDateOnly >= startOfYear && itemDateOnly <= startOfDay;
+        case "Yearly": {
+          // Calculate start of year
+          const yearStart = new Date(testDate.getFullYear(), 0, 1);
+          yearStart.setHours(0, 0, 0, 0);
+          
+          // Calculate start of next year
+          const nextYearStart = new Date(testDate.getFullYear() + 1, 0, 1);
+          nextYearStart.setHours(0, 0, 0, 0);
+          
+          isInRange = itemDate >= yearStart && itemDate < nextYearStart;
           break;
+        }
 
-        case "Custom":
+        case "Custom": {
           if (dateRange.startDate && dateRange.endDate) {
-            // Parse the custom date range and set to start/end of day
-            const startDate = new Date(dateRange.startDate);
+            const startDate = parseDate(dateRange.startDate);
             startDate.setHours(0, 0, 0, 0);
-
-            const endDate = new Date(dateRange.endDate);
+            
+            const endDate = parseDate(dateRange.endDate);
             endDate.setHours(23, 59, 59, 999);
-
-            // Check if the item's start date falls within the selected range
-            const isStartDateInRange =
-              itemDateOnly >= startDate && itemDateOnly <= endDate;
-
-            console.log("Custom filter check:", {
-              itemDate: itemDateOnly.toISOString(),
-              startDate: startDate.toISOString(),
-              endDate: endDate.toISOString(),
-              isInRange: isStartDateInRange,
-              item: item.executionName,
-              itemDateOnly: itemDateOnly.toISOString(),
-              startDateOnly: startDate.toISOString(),
-              endDateOnly: endDate.toISOString(),
-            });
-
-            isInRange = isStartDateInRange;
+            
+            isInRange = itemDate >= startDate && itemDate <= endDate;
           } else {
             isInRange = true;
           }
           break;
+        }
 
         default:
           isInRange = true;
@@ -270,6 +248,8 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
       return isInRange;
     });
+
+    return filteredData;
   };
 
   // Filter data based on search queries (both global and local)
@@ -363,10 +343,23 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
   // Combine all filters and sorting
   const filteredAndSortedData = useMemo(() => {
+    console.log("Recalculating filtered data with:", {
+      timeFilter,
+      dateRange,
+      executionsLength: executions.length
+    });
+
     let data = [...executions];
 
     // Apply time filter first
     data = getFilteredDataByTime(data);
+    console.log("After time filter:", {
+      filteredLength: data.length,
+      sampleItems: data.slice(0, 2).map(item => ({
+        name: item.executionName,
+        startDate: item.startDate
+      }))
+    });
 
     // Then apply search filter
     data = getFilteredDataBySearch(data);
@@ -381,6 +374,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
   }, [
     executions,
     timeFilter,
+    dateRange,
     globalSearchQuery,
     localSearchQuery,
     selectedFilters,
@@ -402,29 +396,24 @@ const Reports = ({ globalSearchQuery = "" }) => {
 
   const handleExport = () => {
     try {
-      // Get the filtered and sorted data directly from the memoized value
       const filteredData = filteredAndSortedData || [];
+      
+      const columnConfig = {
+        id: { header: "Execution ID", type: "string" },
+        hostName: { header: "Host Name", type: "string" },
+        hostIP: { header: "Host IP", type: "string" },
+        executionName: { header: "Execution Name", type: "string" },
+        startDate: { header: "Start Date", type: "date", format: DATE_FORMATS.DISPLAY_WITH_TIME },
+        executionState: { header: "Execution State", type: "string" },
+        type: { header: "Type", type: "string" },
+        executedBy: { header: "Executed by", type: "string" }
+      };
 
-      // Map the data to ensure all fields exist
-      const exportData = filteredData.map((item) => ({
-        "Execution ID": item?.id || "",
-        "Host Name": item?.hostName || "",
-        "Host IP": item?.hostIP || "",
-        "Execution Name": item?.executionName || "",
-        "Start Date": item?.startDate || "",
-        "Execution State": item?.executionState || "",
-        Type: item?.type || "",
-        "Executed by": item?.executedBy || "",
-      }));
-
-      // Export as Excel
+      const exportData = formatDataForExport(filteredData, columnConfig);
       const worksheet = XLSX.utils.json_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Reports");
-      XLSX.writeFile(
-        workbook,
-        `reports-export-${format(new Date(), "yyyy-MM-dd")}.xlsx`
-      );
+      XLSX.writeFile(workbook, createExportFilename("reports-export", "xlsx"));
     } catch (error) {
       console.error("Export failed:", error);
     }
@@ -621,21 +610,14 @@ const Reports = ({ globalSearchQuery = "" }) => {
     if (!isOpen) return null;
 
     const handleApply = () => {
-      if (!dateRange.startDate || !dateRange.endDate) {
-        alert("Please select both start and end dates");
+      const validation = validateDateRange(dateRange.startDate, dateRange.endDate);
+      if (!validation.isValid) {
+        alert(validation.error);
         return;
       }
 
-      const startDate = new Date(dateRange.startDate);
-      const endDate = new Date(dateRange.endDate);
-
-      if (endDate < startDate) {
-        alert("End date cannot be before start date");
-        return;
-      }
-
-      // Set the time filter to Custom and close the modal
       setTimeFilter("Custom");
+      onDateChange(dateRange);
       onClose();
     };
 
@@ -682,9 +664,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                 <input
                   type="date"
                   value={dateRange.startDate}
-                  onChange={(e) =>
-                    onDateChange({ ...dateRange, startDate: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newDateRange = { ...dateRange, startDate: e.target.value };
+                    onDateChange(newDateRange);
+                  }}
                   min={minDate}
                   max={dateRange.endDate || today}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -698,9 +681,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                 <input
                   type="date"
                   value={dateRange.endDate}
-                  onChange={(e) =>
-                    onDateChange({ ...dateRange, endDate: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newDateRange = { ...dateRange, endDate: e.target.value };
+                    onDateChange(newDateRange);
+                  }}
                   min={dateRange.startDate || minDate}
                   max={today}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -711,7 +695,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={() => {
-                  setDateRange({ startDate: "", endDate: "" });
+                  onDateChange({ startDate: "", endDate: "" });
                   onClose();
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -819,7 +803,7 @@ const Reports = ({ globalSearchQuery = "" }) => {
                     <div className="flex items-center gap-4">
                       <div className="inline-flex px-0 py-0 items-center hover:border-gray-200 hover:border bg-white border border-gray-200 border-solid rounded-[8px] min-w-fit">
                         <div
-                          onClick={() => setTimeFilter("Weekly")}
+                          onClick={() => handleTimeFilterChange("Weekly")}
                           className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
                         >
                           <p
@@ -833,8 +817,8 @@ const Reports = ({ globalSearchQuery = "" }) => {
                           </p>
                         </div>
                         <div
-                          onClick={() => setTimeFilter("Monthly")}
-                          className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                          onClick={() => handleTimeFilterChange("Monthly")}
+                          className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
                         >
                           <p
                             className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
@@ -847,8 +831,8 @@ const Reports = ({ globalSearchQuery = "" }) => {
                           </p>
                         </div>
                         <div
-                          onClick={() => setTimeFilter("Yearly")}
-                          className={`px-2 text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                          onClick={() => handleTimeFilterChange("Yearly")}
+                          className={`text-sm font-medium whitespace-nowrap text-black bg-white`}
                         >
                           <p
                             className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${
@@ -862,10 +846,10 @@ const Reports = ({ globalSearchQuery = "" }) => {
                         </div>
                         <div
                           onClick={() => {
+                            handleTimeFilterChange("Custom");
                             setShowDatePickerModal(true);
-                            setTimeFilter("Custom");
                           }}
-                          className={` text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
+                          className={`text-sm font-medium whitespace-nowrap text-black bg-white cursor-pointer`}
                         >
                           <p
                             className={`px-3 py-1 text-sm font-medium whitespace-nowrap text-black cursor-pointer ${

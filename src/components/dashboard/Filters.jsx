@@ -3,6 +3,7 @@ import { Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { parseDate, validateDateRange } from '../../utils/formatters';
 
 export default function Filters({ filters, setFilters }) {
   const [dateRange, setDateRange] = useState([null, null]);
@@ -11,6 +12,14 @@ export default function Filters({ filters, setFilters }) {
   const handleDateRangeChange = (dates) => {
     const [start, end] = dates;
     setDateRange(dates);
+
+    // Validate the date range
+    const validation = validateDateRange(start, end);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
+    }
+
     setFilters(prev => ({
       ...prev,
       dateRange: {
@@ -36,6 +45,13 @@ export default function Filters({ filters, setFilters }) {
         break;
       default:
         start = null;
+    }
+
+    // Validate the date range
+    const validation = validateDateRange(start, now);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
     }
 
     setDateRange([start, now]);
